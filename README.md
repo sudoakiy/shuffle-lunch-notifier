@@ -22,6 +22,9 @@
 
 ## セットアップ
 
+0. claspをインストールしておいてください。
+   - ex. `npm install -g @google/clasp`
+
 1. リポジトリをクローンします。
 ```bash
    git clone https://github.com/your-username/shuffle-lunch-notifier.git
@@ -31,8 +34,13 @@
 ```bash
 npm install
 ```
-3. `.clasp.json`ファイルを設定して、Google Apps Scriptのプロジェクトと連携します。スクリプトプロパティにSlack APIトークン（`SLACK_API_TOKEN`）とチャンネルID（`CHANNEL_ID`）を追加してください。distディレクトリに
-4. TypeScriptをビルドします。
+3. claspにログインし、claspプロジェクトを作成します。
+   - ex1. `clasp login`
+   - ex2. `clasp create --title "shuffle-lunch-notifier"`
+
+4. `.clasp.json`ファイルを編集して、rootDirを"dist"に変更してください。GAS上のスクリプトプロパティでSlack APIトークン（`SLACK_API_TOKEN`）とチャンネルID（`CHANNEL_ID`）を追加してください。
+
+5. TypeScriptをビルドします。
 
 ```bash
 npm run build
