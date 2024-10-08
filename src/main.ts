@@ -6,7 +6,7 @@ const SLACK_API_URL_HISTORY = 'https://slack.com/api/conversations.history';
 const SLACK_API_URL_REACTIONS = 'https://slack.com/api/reactions.get';
 const SLACK_API_URL_POST_MESSAGE = 'https://slack.com/api/chat.postMessage';
 /** メッセージ */
-const MESSAGE_SHUFFLE_LUNCH = '次回金曜日のシャッフルランチ参加者を募集します！';
+const MESSAGE_SHUFFLE_LUNCH = 'リマインダー : 次回金曜日のシャッフルランチ参加者を募集します！';
 const MESSAGE_NO_PARTICIPANTS = '今回は参加者がいませんでした。次回の参加をお待ちしています。';
 /** 参加集計対象とするSlackのリアクション絵文字 */
 const TARGET_REACTIONS = ['man-gesturing-ok', 'woman-gesturing-ok'];
@@ -127,31 +127,25 @@ function sendNoParticipantsMessage(channelId: string, slackToken: string): void 
 const splitIntoGroups = (users: string[], minGroupSize: number, maxGroupSize: number): string[][] => {
   const groups: string[][] = [];
 
-  // 5人未満の場合、全員を1グループにする
+  // 5人以下の場合、全員を1グループにする
   if (users.length <= 5) {
     groups.push(users);
     return groups;
   }
 
-  let currentGroup: string[] = [];
-  for (const user of users) {
-    currentGroup.push(user);
-    if (currentGroup.length === maxGroupSize) {
-      groups.push(currentGroup);
-      currentGroup = [];
-    }
-  }
+  // グループの数を計算する
+  const totalGroups = Math.ceil(users.length / maxGroupSize);
 
-  // 残ったユーザーを処理
-  if (currentGroup.length > 0) {
-    // 残りが最小グループサイズ未満なら、他のグループに分配
-    if (currentGroup.length < minGroupSize && groups.length > 0) {
-      for (let i = 0; i < currentGroup.length; i++) {
-        groups[i % groups.length].push(currentGroup[i]);
-      }
-    } else {
-      groups.push(currentGroup);
-    }
+  // 各グループに適切な人数を割り当てる
+  let startIndex = 0;
+  for (let i = 0; i < totalGroups; i++) {
+    // 残り人数に応じてグループサイズを決める
+    const remainingUsers = users.length - startIndex;
+    const groupSize = Math.min(maxGroupSize, Math.max(minGroupSize, Math.floor(remainingUsers / (totalGroups - i))));
+
+    // グループを作成して追加
+    groups.push(users.slice(startIndex, startIndex + groupSize));
+    startIndex += groupSize;
   }
 
   return groups;
